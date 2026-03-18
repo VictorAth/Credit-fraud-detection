@@ -1,26 +1,45 @@
-# 🛡️ Fraud Sentinel AI : Détection de Fraude Bancaire
+# 🛡️ Fraud Sentinel AI : Système de Détection de Fraude Bancaire
 
-Ce projet utilise le Machine Learning pour identifier les transactions bancaires frauduleuses en temps réel. Développé dans le cadre de mon parcours en IA et Big Data.
+Ce projet est une solution de Machine Learning "End-to-End" permettant d'identifier les transactions bancaires frauduleuses en temps réel. Développé dans le cadre de ma licence en **IA et Big Data (IA-BD)**.
 
 ## 🚀 Application Live
-[Lien vers ton application Streamlit ici]
+Accédez à l'interface interactive ici : 
+👉 [https://credit-fraud-detection-victorath.streamlit.app/](https://credit-fraud-detection-victorath.streamlit.app/)
 
-## 📊 Aperçu du Projet
-L'objectif est de traiter un dataset hautement déséquilibré (0,17% de fraudes) en utilisant des techniques de sous-échantillonnage (Under-sampling) et de nettoyage d'outliers (méthode IQR).
+## 📊 Présentation du Projet
+Le défi principal de ce projet était de traiter un dataset hautement déséquilibré (seulement 0,17% de fraudes). 
 
-### Performance du Modèle (Régression Logistique)
-* **Recall :** 91% (Priorité à la détection des fraudes)
-* **AUC Score :** 0.98
+**Points techniques clés :**
+- **Prétraitement :** Normalisation avec `RobustScaler` et élimination des valeurs aberrantes (Outliers) via la méthode IQR.
+- **Équilibrage :** Utilisation du sous-échantillonnage (Under-sampling) pour entraîner le modèle sur des patterns de fraude clairs.
+- **Algorithme :** Régression Logistique optimisée pour le **Recall**.
+
+### Performances du Modèle
+* **AUC Score :** 0.98 (Excellente capacité de séparation)
+* **Recall :** 91% (Priorité absolue à la détection des fraudes pour minimiser les pertes bancaires)
 * **F1-Score :** 0.92
 
+## 🧑‍💼 Rôle de l'Analyste Fraude
+Cette application n'est pas qu'un simple algorithme ; c'est un **outil d'aide à la décision** destiné aux analystes en milieu bancaire.
+
+**Comment l'analyste utilise l'outil :**
+1. **Réception de l'alerte :** Le système central de la banque signale une transaction suspecte avec des indices techniques (V10, V12, V14).
+2. **Simulation :** L'analyste entre ces indices dans **Fraud Sentinel** pour obtenir une deuxième opinion de l'IA.
+3. **Interprétation :** Grâce aux explications intégrées (XAI), l'analyste comprend *pourquoi* le risque est élevé (ex: anomalie de localisation ou fréquence d'achat suspecte).
+4. **Action :** L'analyste décide alors de valider, de demander une vérification SMS ou de bloquer définitivement la carte.
+
 ## 🛠️ Stack Technique
-* **Langage :** Python
-* **Bibliothèques :** Scikit-Learn, Pandas, NumPy, Matplotlib, Seaborn
-* **Déploiement :** Streamlit Cloud
-* **Environnement :** Google Colab / VS Code
+* **Langages :** Python 3.10
+* **Data Science :** Scikit-Learn, Pandas, NumPy
+* **Visualisation :** Matplotlib, Seaborn
+* **Déploiement :** Streamlit Cloud, GitHub
+* **Environnement :** VS Code, Git Bash
 
 ## 📁 Structure du Dépôt
-* `app.py` : Code de l'interface interactive Streamlit.
-* `model_fraude.pkl` : Modèle de Régression Logistique entraîné.
-* `scaler.pkl` : RobustScaler utilisé pour la normalisation des montants.
-* `requirements.txt` : Liste des dépendances Python.
+- `app.py` : Code de l'application web.
+- `model_fraude.pkl` : Modèle de prédiction sauvegardé.
+- `scaler.pkl` : Transformateur pour la mise à l'échelle des données.
+- `requirements.txt` : Dépendances pour le serveur de déploiement.
+
+---
+*Développé par **Victor Attoh** - Étudiant en IA & Big Data.*
