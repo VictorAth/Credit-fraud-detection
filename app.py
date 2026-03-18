@@ -29,12 +29,12 @@ st.write("Outil d'aide à la décision pour analystes fraude et gestionnaires e-
 st.markdown("---")
 
 # --- GUIDE D'UTILISATION ---
-with st.expander("❓ C'est quoi cette application et comment l'utiliser ?"):
+with st.expander("Documentation: c'est quoi cette application et comment l'utiliser ?"):
     st.markdown("""
-    ### 🧠 Le Concept
+    ###  Le Concept
     Cette IA agit comme un **vigile virtuel**. Elle compare les détails d'une transaction avec des milliers de fraudes passées pour calculer un score de ressemblance.
     
-    ### 📖 Guide Rapide
+    ###  Guide Rapide
     1. **Ajustez les curseurs** à gauche selon les détails reçus dans l'alerte.
     2. **Plus un curseur est à gauche**, plus l'indicateur est jugé "anormal" par rapport aux habitudes du client.
     3. **Observez le diagnostic** : le code couleur (Vert, Orange, Rouge) vous indique l'action à prendre immédiatement.
@@ -44,7 +44,7 @@ with st.expander("❓ C'est quoi cette application et comment l'utiliser ?"):
 col1, col2 = st.columns([1, 1.5])
 
 with col1:
-    st.subheader("📥 Détails de la transaction")
+    st.subheader(" Détails de la transaction")
     st.info("Simulez les paramètres de la transaction suspecte ci-dessous.")
     
     # Sliders avec noms explicites pour l'utilisateur
@@ -75,10 +75,10 @@ with col1:
     amount = st.number_input("Montant de la transaction (€)", min_value=0.0, value=100.0)
     
     st.markdown("---")
-    analyze_btn = st.button("🚀 Lancer le diagnostic IA", use_container_width=True)
+    analyze_btn = st.button(" Lancer le diagnostic IA", use_container_width=True)
 
 with col2:
-    st.subheader("📊 Résultat du Diagnostic")
+    st.subheader(" Résultat du Diagnostic")
     
     if analyze_btn:
         # --- PRÉPARATION DES DONNÉES ---
@@ -119,7 +119,7 @@ with col2:
             st.error("🚨 **ALERTE : FRAUDE PROBABLE** : Très forte ressemblance avec des vols connus.")
 
         # --- RECOMMANDATIONS OPÉRATIONNELLES ---
-        st.markdown("#### 📝 Recommandations pour l'analyste")
+        st.markdown("####  Recommandations pour l'analyste")
         if risk_score < 20:
             st.info("**Action :** Validation automatique immédiate.")
         elif 20 <= risk_score < 50:
@@ -132,8 +132,8 @@ with col2:
         # --- EXPLICATION (XAI) ---
         with st.expander("🔍 Pourquoi ce score ? (Détails techniques)"):
             st.write("Facteurs influençant ce résultat :")
-            if v14 < -5: st.write("- 🚩 **Localisation** : L'écart avec les habitudes est significatif.")
-            if v11 > 5: st.write("- 🚩 **Technique** : Trop d'anomalies systèmes détectées.")
-            if amount > 2000: st.write("- 🚩 **Montant** : Transaction supérieure au seuil de vigilance.")
+            if v14 < -5: st.write("-  **Localisation** : L'écart avec les habitudes est significatif.")
+            if v11 > 5: st.write("-  **Technique** : Trop d'anomalies systèmes détectées.")
+            if amount > 2000: st.write("-  **Montant** : Transaction supérieure au seuil de vigilance.")
     else:
         st.info("Modifiez les paramètres à gauche et cliquez sur le bouton pour obtenir une analyse.")
