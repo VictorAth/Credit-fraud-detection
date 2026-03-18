@@ -3,13 +3,16 @@ import joblib
 import numpy as np
 import pandas as pd
 
-# 1. Configuration de la page
-st.set_page_config(page_title="Fraud Sentinel AI", layout="wide", page_icon="🛡️")
+# 1. CONFIGURATION DE LA PAGE
+st.set_page_config(
+    page_title="Fraud Sentinel AI",
+    layout="wide",
+    page_icon="🛡️"
+)
 
-# 2. Chargement des ressources (Modèle + Scaler)
+# 2. CHARGEMENT DES RESSOURCES (Modèle + Scaler)
 @st.cache_resource
 def load_assets():
-    # Assure-toi que ces fichiers sont bien à la racine de ton GitHub
     model = joblib.load('model_fraude.pkl')
     scaler = joblib.load('scaler.pkl')
     return model, scaler
@@ -20,104 +23,117 @@ except Exception as e:
     st.error(f"Erreur de chargement des fichiers .pkl : {e}")
     st.stop()
 
-# --- INTERFACE ---
+# --- ENTÊTE ---
 st.title("🛡️ Fraud Sentinel : Station d'Analyse IA")
+st.write("Outil d'aide à la décision pour analystes fraude et gestionnaires e-commerce.")
 st.markdown("---")
 
-# --- NOUVEAU : GUIDE D'UTILISATION ET INTERPRÉTATION ---
-with st.expander("📖 Guide d'utilisation et Aide à l'interprétation"):
+# --- GUIDE D'UTILISATION ---
+with st.expander("❓ C'est quoi cette application et comment l'utiliser ?"):
     st.markdown("""
-    ### Bienvenue dans Fraud Sentinel
-    Cette application utilise un modèle de **Régression Logistique** pour prédire si une transaction est frauduleuse.
+    ### 🧠 Le Concept
+    Cette IA agit comme un **vigile virtuel**. Elle compare les détails d'une transaction avec des milliers de fraudes passées pour calculer un score de ressemblance.
     
-    **Comment ça marche ?**
-    Les indicateurs **V10, V11, V12 et V14** sont des variables issues d'une Analyse en Composantes Principales (PCA). Elles résument des comportements complexes (lieu, type de terminal, fréquence d'achat) tout en protégeant l'anonymat des clients.
-    
-    **Interprétation du Score :**
-    * 🟢 **0% - 30% (Légitime) :** Aucun signal suspect détecté.
-    * 🟡 **31% - 75% (Suspect) :** Pattern inhabituel. Une double authentification (3D Secure) est conseillée.
-    * 🔴 **76% - 100% (Fraude) :** Très forte ressemblance avec les schémas de fraude répertoriés. Blocage recommandé.
+    ### 📖 Guide Rapide
+    1. **Ajustez les curseurs** à gauche selon les détails reçus dans l'alerte.
+    2. **Plus un curseur est à gauche**, plus l'indicateur est jugé "anormal" par rapport aux habitudes du client.
+    3. **Observez le diagnostic** : le code couleur (Vert, Orange, Rouge) vous indique l'action à prendre immédiatement.
     """)
 
-# Utilisation de colonnes pour une interface propre
+# --- MISE EN PAGE : DEUX COLONNES ---
 col1, col2 = st.columns([1, 1.5])
 
 with col1:
-    st.subheader("📥 Paramètres de la Transaction")
-    st.info("Ajustez les curseurs pour simuler une transaction.")
+    st.subheader("📥 Détails de la transaction")
+    st.info("Simulez les paramètres de la transaction suspecte ci-dessous.")
     
-    # Sliders avec explications simplifiées (le "Portrait-Robot")
-    v14 = st.slider("Indicateur V14 (Comportement Géographique)", -20.0, 10.0, 0.0, 
-                    help="Plus cette valeur est basse, plus l'achat s'éloigne des habitudes du client.")
+    # Sliders avec noms explicites pour l'utilisateur
+    v14 = st.slider(
+        "📍 Localisation (Habituelle vs Inconnue)", 
+        -20.0, 10.0, 0.0, 
+        help="V14 : Plus la valeur est basse, plus le lieu d'achat est inhabituel pour ce client."
+    )
     
-    v12 = st.slider("Indicateur V12 (Fiabilité du Terminal)", -20.0, 10.0, 0.0,
-                    help="Analyse si l'appareil ou le site utilisé est habituel ou suspect.")
+    v12 = st.slider(
+        "💻 Sécurité du site/appareil", 
+        -20.0, 10.0, 0.0,
+        help="V12 : Analyse si le terminal ou le site web présente des signes de piratage."
+    )
     
-    v10 = st.slider("Indicateur V10 (Fréquence/Rythme d'achat)", -25.0, 10.0, 0.0,
-                    help="Détermine si la vitesse des transactions est inhabituelle.")
+    v10 = st.slider(
+        "⏳ Rythme des achats", 
+        -25.0, 10.0, 0.0,
+        help="V10 : Détermine si la vitesse des transactions ressemble à un comportement de robot."
+    )
     
-    v11 = st.slider("Indicateur V11 (Niveau d'Anomalie Globale)", -5.0, 15.0, 0.0,
-                    help="Une valeur élevée renforce les autres signaux d'alerte.")
+    v11 = st.slider(
+        "⚠️ Signal d'alerte technique", 
+        -5.0, 15.0, 0.0,
+        help="V11 : Mesure le niveau global d'anomalies techniques durant le paiement."
+    )
     
     amount = st.number_input("Montant de la transaction (€)", min_value=0.0, value=100.0)
     
-    analyze_btn = st.button("🚀 Lancer l'Analyse Score-IA", use_container_width=True)
+    st.markdown("---")
+    analyze_btn = st.button("🚀 Lancer le diagnostic IA", use_container_width=True)
 
 with col2:
     st.subheader("📊 Résultat du Diagnostic")
     
     if analyze_btn:
         # --- PRÉPARATION DES DONNÉES ---
-        # Ordre exact des colonnes utilisé pendant l'entraînement (Phase 4)
-        columns = ['scaled_amount', 'scaled_time', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6', 'V7', 'V8', 'V9', 'V10', 
-                   'V11', 'V12', 'V13', 'V14', 'V15', 'V16', 'V17', 'V18', 'V19', 'V20', 'V21', 'V22', 
-                   'V23', 'V24', 'V25', 'V26', 'V27', 'V28']
+        columns = [
+            'scaled_amount', 'scaled_time', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6', 'V7', 'V8', 'V9', 'V10', 
+            'V11', 'V12', 'V13', 'V14', 'V15', 'V16', 'V17', 'V18', 'V19', 'V20', 'V21', 'V22', 
+            'V23', 'V24', 'V25', 'V26', 'V27', 'V28'
+        ]
         
+        # Création du DataFrame avec toutes les colonnes à zéro
         inputs = pd.DataFrame(np.zeros((1, len(columns))), columns=columns)
 
-        # Injection des variables
+        # Injection des valeurs des sliders
         inputs['V14'] = v14
         inputs['V12'] = v12
         inputs['V10'] = v10
         inputs['V11'] = v11
         
-        # Mise à l'échelle du montant avec le RobustScaler
+        # Application du scaler sur le montant
         inputs['scaled_amount'] = scaler.transform([[amount]])[0][0]
-        inputs['scaled_time'] = 0.0 # Simulation d'un temps neutre
+        inputs['scaled_time'] = 0.0 
 
         # --- PRÉDICTION ---
         proba = model.predict_proba(inputs)[0] 
         risk_score = proba[1] * 100
         
-        # Affichage visuel du score
-        st.write(f"**Score de Risque calculé par l'IA : {risk_score:.1f}%**")
+        # --- AFFICHAGE DU SCORE ---
+        st.write(f"### Score de Risque : **{risk_score:.1f}%**")
         
         if risk_score < 30:
             st.progress(risk_score / 100)
-            st.success("✅ TRANSACTION LÉGITIME")
+            st.success("✅ **TRANSACTION LÉGITIME** : Risque faible, validation recommandée.")
         elif risk_score < 75:
             st.progress(risk_score / 100)
-            st.warning("⚠️ TRANSACTION SUSPECTE")
+            st.warning("⚠️ **TRANSACTION SUSPECTE** : Des patterns inhabituels ont été détectés.")
         else:
             st.progress(risk_score / 100)
-            st.error("🚨 ALERTE : FRAUDE PROBABLE")
+            st.error("🚨 **ALERTE : FRAUDE PROBABLE** : Très forte ressemblance avec des vols connus.")
 
         # --- RECOMMANDATIONS OPÉRATIONNELLES ---
-        st.markdown("### 📝 Recommandations pour l'Agent")
+        st.markdown("#### 📝 Recommandations pour l'analyste")
         if risk_score < 20:
-            st.info("**Action :** Validation immédiate. Risque négligeable.")
+            st.info("**Action :** Validation automatique immédiate.")
         elif 20 <= risk_score < 50:
-            st.info("**Action :** Demander une vérification 3D Secure (SMS).")
+            st.info("**Action :** Déclencher une authentification forte (3D Secure / SMS).")
         elif 50 <= risk_score < 80:
-            st.warning("**Action :** Mise en attente. Appel de confirmation nécessaire.")
+            st.warning("**Action :** Mise en attente. Appel téléphonique du client nécessaire.")
         else:
-            st.error("**Action :** BLOCAGE IMMÉDIAT. Signalement au département conformité.")
+            st.error("**Action :** BLOCAGE IMMÉDIAT. Procédure de signalement conformité.")
 
-        # --- EXPLICATION LITE (XAI) ---
+        # --- EXPLICATION (XAI) ---
         with st.expander("🔍 Pourquoi ce score ? (Détails techniques)"):
-            st.write("Analyse des facteurs de risque :")
-            if v14 < -5: st.write("- 🚩 **V14 Bas :** L'écart géographique ou comportemental est très élevé.")
-            if v11 > 5: st.write("- 🚩 **V11 Haut :** Une anomalie structurelle a été détectée dans la transaction.")
-            if amount > 2000: st.write("- 🚩 **Montant :** La valeur dépasse les seuils de vigilance standard.")
+            st.write("Facteurs influençant ce résultat :")
+            if v14 < -5: st.write("- 🚩 **Localisation** : L'écart avec les habitudes est significatif.")
+            if v11 > 5: st.write("- 🚩 **Technique** : Trop d'anomalies systèmes détectées.")
+            if amount > 2000: st.write("- 🚩 **Montant** : Transaction supérieure au seuil de vigilance.")
     else:
-        st.info("Ajustez les paramètres à gauche et cliquez sur le bouton pour analyser.")
+        st.info("Modifiez les paramètres à gauche et cliquez sur le bouton pour obtenir une analyse.")
